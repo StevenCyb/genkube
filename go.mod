@@ -1,4 +1,4 @@
-module genkube
+module github.com/StevenCyb/genkube
 
 go 1.20
 

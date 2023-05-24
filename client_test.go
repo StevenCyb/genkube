@@ -1,8 +1,9 @@
 package genkube
 
 import (
-	v1 "genkube/test/api/v1"
 	"testing"
+
+	v1 "github.com/StevenCyb/genkube/test/api/v1"
 
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/zap"
