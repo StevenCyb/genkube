@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -29,12 +30,12 @@ func TestGet(t *testing.T) {
 	}
 
 	obj := &corev1.Pod{}
-	err := testClient.Get(context.TODO(), types.NamespacedName{
+	err := testClient.Get(context.Background(), types.NamespacedName{
 		Namespace: "my-namespace",
 		Name:      "my-pod",
 	}, obj)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, "my-pod", obj.Name)
 }
 
@@ -67,9 +68,9 @@ func TestList(t *testing.T) {
 	}
 
 	objs := &corev1.PodList{}
-	err := testClient.List(context.TODO(), objs, client.InNamespace("my-namespace"))
+	err := testClient.List(context.Background(), objs, client.InNamespace("my-namespace"))
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Len(t, objs.Items, 2)
 }
 
@@ -88,17 +89,17 @@ func TestCreate(t *testing.T) {
 		},
 	}
 
-	err := testClient.Create(context.TODO(), pod)
+	err := testClient.Create(context.Background(), pod)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	obj := &corev1.Pod{}
-	err = fakeClient.Get(context.TODO(), types.NamespacedName{
+	err = fakeClient.Get(context.Background(), types.NamespacedName{
 		Namespace: "my-namespace",
 		Name:      "my-pod",
 	}, obj)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, pod.Name, obj.Name)
 }
 
@@ -118,21 +119,21 @@ func TestDelete(t *testing.T) {
 	}
 
 	// Create the pod first
-	err := fakeClient.Create(context.TODO(), pod)
-	assert.NoError(t, err)
+	err := fakeClient.Create(context.Background(), pod)
+	require.NoError(t, err)
 
 	// Delete the pod
-	err = testClient.Delete(context.TODO(), pod)
-	assert.NoError(t, err)
+	err = testClient.Delete(context.Background(), pod)
+	require.NoError(t, err)
 
 	// Verify that the pod is deleted
 	obj := &corev1.Pod{}
-	err = fakeClient.Get(context.TODO(), types.NamespacedName{
+	err = fakeClient.Get(context.Background(), types.NamespacedName{
 		Namespace: "my-namespace",
 		Name:      "my-pod",
 	}, obj)
 	assert.Error(t, err)
-	assert.NoError(t, client.IgnoreNotFound(err))
+	require.NoError(t, client.IgnoreNotFound(err))
 }
 
 func TestDeleteAllOf(t *testing.T) {
@@ -158,19 +159,19 @@ func TestDeleteAllOf(t *testing.T) {
 	}
 
 	// Create the pods first
-	err := fakeClient.Create(context.TODO(), pod1)
-	assert.NoError(t, err)
-	err = fakeClient.Create(context.TODO(), pod2)
-	assert.NoError(t, err)
+	err := fakeClient.Create(context.Background(), pod1)
+	require.NoError(t, err)
+	err = fakeClient.Create(context.Background(), pod2)
+	require.NoError(t, err)
 
 	// Delete all pods in the namespace
-	err = testClient.DeleteAllOf(context.TODO(), &corev1.Pod{}, client.InNamespace("my-namespace"))
-	assert.NoError(t, err)
+	err = testClient.DeleteAllOf(context.Background(), &corev1.Pod{}, client.InNamespace("my-namespace"))
+	require.NoError(t, err)
 
 	// Verify that all pods are deleted
 	pods := &corev1.PodList{}
-	err = fakeClient.List(context.TODO(), pods, client.InNamespace("my-namespace"))
-	assert.NoError(t, err)
+	err = fakeClient.List(context.Background(), pods, client.InNamespace("my-namespace"))
+	require.NoError(t, err)
 	assert.Len(t, pods.Items, 0)
 }
 
@@ -198,22 +199,22 @@ func TestPatch(t *testing.T) {
 	}
 
 	// Create the pod first
-	err := fakeClient.Create(context.TODO(), pod)
-	assert.NoError(t, err)
+	err := fakeClient.Create(context.Background(), pod)
+	require.NoError(t, err)
 
 	// Modify the pod's image using Patch
 	modifiedPod := pod.DeepCopy()
 	modifiedPod.Spec.Containers[0].Image = "nginx:modified"
-	err = testClient.Patch(context.TODO(), modifiedPod, client.MergeFrom(pod.DeepCopy()))
-	assert.NoError(t, err)
+	err = testClient.Patch(context.Background(), modifiedPod, client.MergeFrom(pod.DeepCopy()))
+	require.NoError(t, err)
 
 	// Retrieve the patched pod
 	retrievedPod := &corev1.Pod{}
-	err = fakeClient.Get(context.TODO(), types.NamespacedName{
+	err = fakeClient.Get(context.Background(), types.NamespacedName{
 		Namespace: "my-namespace",
 		Name:      "my-pod",
 	}, retrievedPod)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Verify that the image has been modified
 	assert.Equal(t, "nginx:modified", retrievedPod.Spec.Containers[0].Image)
@@ -243,23 +244,23 @@ func TestUpdate(t *testing.T) {
 	}
 
 	// Create the pod first
-	err := fakeClient.Create(context.TODO(), pod)
-	assert.NoError(t, err)
+	err := fakeClient.Create(context.Background(), pod)
+	require.NoError(t, err)
 
 	// Modify the pod's image
 	pod.Spec.Containers[0].Image = "nginx:modified"
 
 	// Update the pod
-	err = testClient.Update(context.TODO(), pod)
-	assert.NoError(t, err)
+	err = testClient.Update(context.Background(), pod)
+	require.NoError(t, err)
 
 	// Retrieve the updated pod
 	retrievedPod := &corev1.Pod{}
-	err = fakeClient.Get(context.TODO(), types.NamespacedName{
+	err = fakeClient.Get(context.Background(), types.NamespacedName{
 		Namespace: "my-namespace",
 		Name:      "my-pod",
 	}, retrievedPod)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Verify that the image has been updated
 	assert.Equal(t, "nginx:modified", retrievedPod.Spec.Containers[0].Image)

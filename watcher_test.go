@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
@@ -40,8 +40,8 @@ func TestWatchResource(t *testing.T) {
 
 	go testClient.WatchResource(fakePod, fakePodList, eventHandler, client.InNamespace("my-namespace"))
 
-	err := fakeClient.Create(context.TODO(), fakePod)
-	assert.NoError(t, err)
+	err := fakeClient.Create(context.Background(), fakePod)
+	require.NoError(t, err)
 
 	time.Sleep(time.Millisecond * 100)
 	testClient.Close()
