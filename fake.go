@@ -22,5 +22,6 @@ func NewFake(logger *zap.SugaredLogger, addToSchemeFuncs ...AddToSchemeFunc) (*C
 	return &Client{
 		logger:    logger,
 		WithWatch: fc,
+		close:     make(chan struct{}),
 	}, nil
 }

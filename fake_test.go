@@ -28,6 +28,8 @@ func TestFake(t *testing.T) {
 	})
 	require.NoError(t, err)
 
+	defer fake.Close()
+
 	podList := &corev1.PodList{}
 	err = fake.List(context.Background(), podList)
 	require.NoError(t, err)
