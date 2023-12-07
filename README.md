@@ -54,3 +54,7 @@ Most of them are part of the original client from *sigs.k8s.io* (including descr
     eventHandler cache.ResourceEventHandlerFuncs, opts ...runtimeClient.ListOption,
   )
 ```
+
+## Fake
+To perform unit tests without an actual cluster, use the `NewFake` function to create a fake client.
+This client can be used to interact with the client like on an real cluster.
