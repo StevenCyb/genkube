@@ -3,7 +3,6 @@ package genkube
 import (
 	"errors"
 
-	"go.uber.org/zap"
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/client-go/rest"
@@ -20,7 +19,7 @@ type AddToSchemeFunc func(s *runtime.Scheme) error
 // Client that wraps the common dynamic client and
 // provide basic functionality of the Kubernetes API.
 type Client struct {
-	logger *zap.SugaredLogger
+	logger Logger
 	close  chan struct{}
 	client.WithWatch
 }
@@ -28,7 +27,7 @@ type Client struct {
 // New creates a new client for multiple resource groups.
 // Leave `kubeCredentialFile` empty to use cluster configuration.
 // By default, no scheme is registered.
-func New(logger *zap.SugaredLogger, kubeCredentialFile string, addToSchemeFuncs ...AddToSchemeFunc) (*Client, error) {
+func New(logger Logger, kubeCredentialFile string, addToSchemeFuncs ...AddToSchemeFunc) (*Client, error) {
 	if len(addToSchemeFuncs) == 0 {
 		return nil, ErrNoNoScheme
 	}
